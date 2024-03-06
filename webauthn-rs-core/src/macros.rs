@@ -8,7 +8,7 @@ macro_rules! cbor_try_map {
         }
     }};
 }
-
+#[allow(unused)]
 macro_rules! cbor_try_array {
     (
         $v:expr
@@ -19,7 +19,7 @@ macro_rules! cbor_try_array {
         }
     }};
 }
-
+#[allow(unused)]
 macro_rules! cbor_try_string {
     (
         $v:expr

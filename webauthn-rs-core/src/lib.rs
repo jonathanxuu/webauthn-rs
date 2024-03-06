@@ -48,7 +48,7 @@ pub mod proto {
     pub use webauthn_rs_proto::*;
 }
 
-pub use attestation::verify_attestation_ca_chain;
+// pub use attestation::verify_attestation_ca_chain;
 pub use attestation::AttestationFormat;
 
 pub use crate::core::*;

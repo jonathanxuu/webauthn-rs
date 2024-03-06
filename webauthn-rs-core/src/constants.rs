@@ -7,6 +7,7 @@ pub const AUTHENTICATOR_TIMEOUT: u32 = 60000;
 // https://www.apple.com/certificateauthority/private/.
 // The certificate data itself (as linked in the cert listing linked above) can be found at
 // https://www.apple.com/certificateauthority/Apple_WebAuthn_Root_CA.pem.
+#[allow(unused)]
 pub const APPLE_WEBAUTHN_ROOT_CA_PEM: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIICEjCCAZmgAwIBAgIQaB0BbHo84wIlpQGUKEdXcTAKBggqhkjOPQQDAzBLMR8w
 HQYDVQQDDBZBcHBsZSBXZWJBdXRobiBSb290IENBMRMwEQYDVQQKDApBcHBsZSBJ
@@ -24,6 +25,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 
 // Yubico root cert.
 // https://developers.yubico.com/U2F/yubico-u2f-ca-certs.txt
+#[allow(unused)]
 pub const YUBICO_U2F_ROOT_CA_SERIAL_457200631_PEM: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIIDHjCCAgagAwIBAgIEG0BT9zANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZ
 dWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAw
@@ -45,6 +47,7 @@ U9psmyPzK+Vsgw2jeRQ5JlKDyqE0hebfC1tvFu0CCrJFcw==
 -----END CERTIFICATE-----";
 
 // https://docs.microsoft.com/en-us/windows-server/security/guarded-fabric-shielded-vm/guarded-fabric-install-trusted-tpm-root-certificates
+#[allow(unused)]
 pub const MICROSOFT_TPM_ROOT_CERTIFICATE_AUTHORITY_2014_PEM: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIIF9TCCA92gAwIBAgIQXbYwTgy/J79JuMhpUB5dyzANBgkqhkiG9w0BAQsFADCB
 jDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCldhc2hpbmd0b24xEDAOBgNVBAcTB1Jl
@@ -81,6 +84,7 @@ urLopziOUeWokxZN1syrEdKlhFoPYavm6t+PzIcpdxZwHA+V3jLJPfI=
 -----END CERTIFICATE-----";
 
 // Nitrokey fido2 and u2f root certs
+#[allow(unused)]
 pub const NITROKEY_FIDO2_ROOT_CA_PEM: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIIBmjCCAT8CFBZiBJbp2fT/LaRJ8Xwl9qhX62boMAoGCCqGSM49BAMCME4xCzAJ
 BgNVBAYTAkRFMRYwFAYDVQQKDA1OaXRyb2tleSBHbWJIMRAwDgYDVQQLDAdSb290
@@ -93,6 +97,7 @@ BAMCA0kAMEYCIQDLmdy2G2mM4rZKjl6CVfjV7khilIS5D3xRQzubeqzQNAIhAKIG
 X29SfiB6K9k6Hb3q+q7bRn1o1dhV1cj592YYnu1/
 -----END CERTIFICATE-----";
 
+#[allow(unused)]
 pub const NITROKEY_U2F_ROOT_CA_PEM: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIIBlTCCATqgAwIBAgIJAMBE6C6nkMPQMAoGCCqGSM49BAMCMB0xGzAZBgNVBAMM
 Ek5pdHJva2V5IFJvb3QgQ0EgMjAeFw0xODEwMzAwMTQ1NTlaFw0zODEwMjUwMTQ1
@@ -105,6 +110,7 @@ ADBGAiEApf7+miYmy9hZ7hjj8M9v1hxRFPTaoAmwZrrEFSsasywCIQCYYa7ZvmIE
 skmkHTvaRVpIFP7npdI1nvHitJG2wEx4Iw==
 -----END CERTIFICATE-----";
 
+#[allow(unused)]
 pub const ANDROID_ROOT_CA_1: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIIFYDCCA0igAwIBAgIJAOj6GWMU0voYMA0GCSqGSIb3DQEBCwUAMBsxGTAXBgNV
 BAUTEGY5MjAwOWU4NTNiNmIwNDUwHhcNMTYwNTI2MTYyODUyWhcNMjYwNTI0MTYy
@@ -137,6 +143,7 @@ MDSXYrB4I4WHXPGjxhZuCuPBLTdOLU8YRvMYdEvYebWHMpvwGCF6bAx3JBpIeOQ1
 wDB5y0USicV3YgYGmi+NZfhA4URSh77Yd6uuJOJENRaNVTzk
 -----END CERTIFICATE-----";
 
+#[allow(unused)]
 pub const ANDROID_ROOT_CA_2: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIIFHDCCAwSgAwIBAgIJANUP8luj8tazMA0GCSqGSIb3DQEBCwUAMBsxGTAXBgNV
 BAUTEGY5MjAwOWU4NTNiNmIwNDUwHhcNMTkxMTIyMjAzNzU4WhcNMzQxMTE4MjAz
@@ -168,6 +175,7 @@ ZutL8VuFkERQGt6vQ2OCw0sV47VMkuYbacK/xyZFiRcrPJPb41zgbQj9XAEyLKCH
 ex0SdDrx+tWUDqG8At2JHA==
 -----END CERTIFICATE-----";
 
+#[allow(unused)]
 pub const ANDROID_ROOT_CA_3: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIIFHDCCAwSgAwIBAgIJAMNrfES5rhgxMA0GCSqGSIb3DQEBCwUAMBsxGTAXBgNV
 BAUTEGY5MjAwOWU4NTNiNmIwNDUwHhcNMjExMTE3MjMxMDQyWhcNMzYxMTEzMjMx
@@ -199,6 +207,7 @@ Ob3bKOwwIWdEFle/YF/h6zWgdeoaNGDqVBrLr2+0DtWoiB1aDEjLWl9FmyIUyUm7
 mD/vFDkzF+wm7cyWpQpCVQ==
 -----END CERTIFICATE-----";
 
+#[allow(unused)]
 pub const ANDROID_SOFTWARE_ROOT_CA: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIICizCCAjKgAwIBAgIJAKIFntEOQ1tXMAoGCCqGSM49BAMCMIGYMQswCQYDVQQG
 EwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNTW91bnRhaW4gVmll
@@ -216,6 +225,7 @@ SM49BAMCA0cAMEQCIDUho++LNEYenNVg8x1YiSBq3KNlQfYNns6KGYxmSGB7AiBN
 C/NR2TB8fVvaNTQdqEcbY6WFZTytTySn502vQX3xvw==
 -----END CERTIFICATE-----";
 
+#[allow(unused)]
 pub const GOOGLE_SAFETYNET_CA_OLD: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIIDujCCAqKgAwIBAgILBAAAAAABD4Ym5g0wDQYJKoZIhvcNAQEFBQAwTDEgMB4G
 A1UECxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjIxEzARBgNVBAoTCkdsb2JhbFNp
@@ -239,6 +249,7 @@ AfvDbbnvRG15RjF+Cv6pgsH/76tuIMRQyV+dTZsXjAzlAcmgQWpzU/qlULRuJQ/7
 TBj0/VLZjmmx6BEP3ojY+x1J96relc8geMJgEtslQIxq/H5COEBkEveegeGTLg==
 -----END CERTIFICATE-----";
 
+#[allow(unused)]
 pub const GOOGLE_SAFETYNET_CA: &[u8] = b"-----BEGIN CERTIFICATE-----
 MIIFWjCCA0KgAwIBAgIQbkepxUtHDA3sM9CJuRz04TANBgkqhkiG9w0BAQwFADBH
 MQswCQYDVQQGEwJVUzEiMCAGA1UEChMZR29vZ2xlIFRydXN0IFNlcnZpY2VzIExM

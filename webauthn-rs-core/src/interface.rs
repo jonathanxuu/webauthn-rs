@@ -1,8 +1,10 @@
 //! Extended Structs and representations for Webauthn Operations. These types are designed
 //! to allow persistance and should not change.
 
-use crate::attestation::{verify_attestation_ca_chain, AttestationFormat};
-use crate::constants::*;
+// use crate::attestation::{verify_attestation_ca_chain, AttestationFormat};
+use crate::attestation::{AttestationFormat};
+
+// use crate::constants::*;
 use crate::error::*;
 use std::fmt;
 use webauthn_rs_proto::cose::*;
@@ -14,8 +16,8 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
-use openssl::hash::MessageDigest;
-use openssl::x509;
+// use openssl::hash::MessageDigest;
+// use openssl::x509;
 use uuid::Uuid;
 
 /// Representation of an AAGUID
@@ -251,33 +253,33 @@ pub struct Credential {
     pub attestation_format: AttestationFormat,
 }
 
-impl Credential {
-    /// Re-verify this Credential's attestation chain. This re-applies the same process
-    /// for certificate authority verification that occured at registration. This can
-    /// be useful if you want to re-assert your credentials match an updated or changed
-    /// ca_list from the time that registration occured. This can also be useful to
-    /// re-determine certain properties of your device that may exist.
-    ///
-    /// # Safety
-    /// Due to the design of CA infrastructure by certain providers, it is NOT possible
-    /// to verify the CA expiry time. Certain vendors use CA intermediates that have
-    /// expiries that are only valid for approximately 10 minutes, meaning that if we
-    /// enforced time validity, these would false negative for their validity.
-    pub fn verify_attestation<'a>(
-        &'_ self,
-        ca_list: &'a AttestationCaList,
-    ) -> Result<Option<&'a AttestationCa>, WebauthnError> {
-        // Why do we disable this? Because of Apple. They issue dynamic short lived
-        // attestation certs, that last for about 5 minutes. This means that
-        // post-registration validation will always fail if we validate time.
-        let danger_disable_certificate_time_checks = true;
-        verify_attestation_ca_chain(
-            &self.attestation.data,
-            ca_list,
-            danger_disable_certificate_time_checks,
-        )
-    }
-}
+// impl Credential {
+//     /// Re-verify this Credential's attestation chain. This re-applies the same process
+//     /// for certificate authority verification that occured at registration. This can
+//     /// be useful if you want to re-assert your credentials match an updated or changed
+//     /// ca_list from the time that registration occured. This can also be useful to
+//     /// re-determine certain properties of your device that may exist.
+//     ///
+//     /// # Safety
+//     /// Due to the design of CA infrastructure by certain providers, it is NOT possible
+//     /// to verify the CA expiry time. Certain vendors use CA intermediates that have
+//     /// expiries that are only valid for approximately 10 minutes, meaning that if we
+//     /// enforced time validity, these would false negative for their validity.
+//     pub fn verify_attestation<'a>(
+//         &'_ self,
+//         ca_list: &'a AttestationCaList,
+//     ) -> Result<Option<&'a AttestationCa>, WebauthnError> {
+//         // Why do we disable this? Because of Apple. They issue dynamic short lived
+//         // attestation certs, that last for about 5 minutes. This means that
+//         // post-registration validation will always fail if we validate time.
+//         let danger_disable_certificate_time_checks = true;
+//         verify_attestation_ca_chain(
+//             &self.attestation.data,
+//             ca_list,
+//             danger_disable_certificate_time_checks,
+//         )
+//     }
+// }
 
 impl From<CredentialV3> for Credential {
     fn from(other: CredentialV3) -> Credential {
@@ -449,16 +451,17 @@ pub enum AttestationMetadata {
 pub enum ParsedAttestationData {
     /// The credential is authenticated by a signing X509 Certificate
     /// from a vendor or provider.
-    Basic(Vec<x509::X509>),
+    // Basic(Vec<x509::X509>),
+    Basic(Vec<u8>),
     /// The credential is authenticated using surrogate basic attestation
     /// it uses the credential private key to create the attestation signature
     Self_,
     /// The credential is authenticated using a CA, and may provide a
     /// ca chain to validate to it's root.
-    AttCa(Vec<x509::X509>),
+    AttCa(Vec<u8>),
     /// The credential is authenticated using an anonymization CA, and may provide a ca chain to
     /// validate to it's root.
-    AnonCa(Vec<x509::X509>),
+    AnonCa(Vec<u8>),
     /// Unimplemented
     ECDAA,
     /// No Attestation type was provided with this Credential. If in doubt
@@ -475,7 +478,7 @@ impl Into<SerialisableAttestationData> for ParsedAttestationData {
             ParsedAttestationData::Basic(chain) => SerialisableAttestationData::Basic(
                 chain
                     .into_iter()
-                    .map(|c| Base64UrlSafeData(c.to_der().expect("Invalid DER")))
+                    .map(|c| Base64UrlSafeData(p256::pkcs8::der::Encode::to_der(&c).expect("Invalid DER")))
                     .collect(),
             ),
             ParsedAttestationData::Self_ => SerialisableAttestationData::Self_,
@@ -483,14 +486,14 @@ impl Into<SerialisableAttestationData> for ParsedAttestationData {
                 // Base64UrlSafeData(c.to_der().expect("Invalid DER")),
                 chain
                     .into_iter()
-                    .map(|c| Base64UrlSafeData(c.to_der().expect("Invalid DER")))
+                    .map(|c| Base64UrlSafeData(p256::pkcs8::der::Encode::to_der(&c).expect("Invalid DER")))
                     .collect(),
             ),
             ParsedAttestationData::AnonCa(chain) => SerialisableAttestationData::AnonCa(
                 // Base64UrlSafeData(c.to_der().expect("Invalid DER")),
                 chain
                     .into_iter()
-                    .map(|c| Base64UrlSafeData(c.to_der().expect("Invalid DER")))
+                    .map(|c| Base64UrlSafeData(p256::pkcs8::der::Encode::to_der(&c).expect("Invalid DER")))
                     .collect(),
             ),
             ParsedAttestationData::ECDAA => SerialisableAttestationData::ECDAA,
@@ -505,27 +508,30 @@ impl TryFrom<SerialisableAttestationData> for ParsedAttestationData {
 
     fn try_from(data: SerialisableAttestationData) -> Result<Self, Self::Error> {
         Ok(match data {
-            SerialisableAttestationData::Basic(chain) => ParsedAttestationData::Basic(
-                chain
-                    .into_iter()
-                    .map(|c| x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError))
-                    .collect::<WebauthnResult<_>>()?,
-            ),
+            SerialisableAttestationData::Basic(_chain) => return Err(WebauthnError::Configuration),
+            // ParsedAttestationData::Basic(
+            //     chain
+            //         .into_iter()
+            //         .map(|c| x509_parser::x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError))
+            //         .collect::<WebauthnResult<_>>()?,
+            // ),
             SerialisableAttestationData::Self_ => ParsedAttestationData::Self_,
-            SerialisableAttestationData::AttCa(chain) => ParsedAttestationData::AttCa(
-                // x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError)?,
-                chain
-                    .into_iter()
-                    .map(|c| x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError))
-                    .collect::<WebauthnResult<_>>()?,
-            ),
-            SerialisableAttestationData::AnonCa(chain) => ParsedAttestationData::AnonCa(
-                // x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError)?,
-                chain
-                    .into_iter()
-                    .map(|c| x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError))
-                    .collect::<WebauthnResult<_>>()?,
-            ),
+            SerialisableAttestationData::AttCa(_chain) => return Err(WebauthnError::Configuration),
+            // ParsedAttestationData::AttCa(
+            //     x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError)?,
+            //     chain
+            //         .into_iter()
+            //         .map(|c| x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError))
+            //         .collect::<WebauthnResult<_>>()?,
+            // ),
+            SerialisableAttestationData::AnonCa(_chain) => return Err(WebauthnError::Configuration),
+            // ParsedAttestationData::AnonCa(
+            //     // x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError)?,
+            //     chain
+            //         .into_iter()
+            //         .map(|c| x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError))
+            //         .collect::<WebauthnResult<_>>()?,
+            // ),
             SerialisableAttestationData::ECDAA => ParsedAttestationData::ECDAA,
             SerialisableAttestationData::None => ParsedAttestationData::None,
             SerialisableAttestationData::Uncertain => ParsedAttestationData::Uncertain,
@@ -596,6 +602,7 @@ pub struct AuthenticationSignedExtensions {
 #[derive(Debug, Clone)]
 pub(crate) struct AttestedCredentialData {
     /// The guid of the authenticator. May indicate manufacturer.
+    #[allow(unused)]
     pub(crate) aaguid: Aaguid,
     /// The credential ID.
     pub(crate) credential_id: CredentialID,
@@ -671,7 +678,7 @@ impl AuthenticationResult {
 /// A serialised Attestation CA.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SerialisableAttestationCa {
-    pub(crate) ca: Base64UrlSafeData,
+    // pub(crate) ca: Base64UrlSafeData,
     pub(crate) aaguids: BTreeSet<Uuid>,
 }
 
@@ -686,7 +693,8 @@ pub struct SerialisableAttestationCa {
 )]
 pub struct AttestationCa {
     /// The x509 root CA of the attestation chain that a security key will be attested to.
-    pub ca: x509::X509,
+    // pub ca: x509_parser::x509,
+
     /// If not empty, the set of acceptable AAGUIDS (Device Ids) that are allowed to be
     /// attested as trusted by this CA. AAGUIDS that are not in this set, but signed by
     /// this CA will NOT be trusted.
@@ -696,7 +704,7 @@ pub struct AttestationCa {
 impl Into<SerialisableAttestationCa> for AttestationCa {
     fn into(self) -> SerialisableAttestationCa {
         SerialisableAttestationCa {
-            ca: Base64UrlSafeData(self.ca.to_der().expect("Invalid DER")),
+            // ca: Base64UrlSafeData(self.ca.to_der().expect("Invalid DER")),
             aaguids: self.aaguids,
         }
     }
@@ -707,7 +715,7 @@ impl TryFrom<SerialisableAttestationCa> for AttestationCa {
 
     fn try_from(data: SerialisableAttestationCa) -> Result<Self, Self::Error> {
         Ok(AttestationCa {
-            ca: x509::X509::from_der(&data.ca.0).map_err(WebauthnError::OpenSSLError)?,
+            // ca: x509::X509::from_der(&data.ca.0).map_err(WebauthnError::OpenSSLError)?,
             aaguids: data.aaguids,
         })
     }
@@ -715,12 +723,12 @@ impl TryFrom<SerialisableAttestationCa> for AttestationCa {
 
 impl AttestationCa {
     /// Retrieve the Key Identifier for this Attestation Ca
-    pub fn get_kid(&self) -> Result<Vec<u8>, WebauthnError> {
-        self.ca
-            .digest(MessageDigest::sha256())
-            .map_err(WebauthnError::OpenSSLError)
-            .map(|bytes| bytes.to_vec())
-    }
+    // pub fn get_kid(&self) -> Result<Vec<u8>, WebauthnError> {
+    //     self.ca
+    //         .digest(MessageDigest::sha256())
+    //         .map_err(WebauthnError::OpenSSLError)
+    //         .map(|bytes| bytes.to_vec())
+    // }
 
     /// Update the set of aaguids this Attestation CA allows. If an empty btreeset is provided then
     /// this Attestation CA allows all Aaguids.
@@ -735,9 +743,9 @@ impl AttestationCa {
     }
 
     /// Create a customised attestation CA from a DER public key.
-    pub fn new_from_der(data: &[u8]) -> Result<Self, WebauthnError> {
+    pub fn new_from_der(_data: &[u8]) -> Result<Self, WebauthnError> {
         Ok(AttestationCa {
-            ca: x509::X509::from_der(data).map_err(WebauthnError::OpenSSLError)?,
+            // ca: x509::X509::from_der(data).map_err(WebauthnError::OpenSSLError)?,
             aaguids: BTreeSet::default(),
         })
     }
@@ -745,7 +753,7 @@ impl AttestationCa {
     /// The Apple TouchID and FaceID root CA.
     pub fn apple_webauthn_root_ca() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(APPLE_WEBAUTHN_ROOT_CA_PEM).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(APPLE_WEBAUTHN_ROOT_CA_PEM).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -753,7 +761,7 @@ impl AttestationCa {
     /// The yubico u2f root ca. Applies to all devices up to and including series 5.
     pub fn yubico_u2f_root_ca_serial_457200631() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(YUBICO_U2F_ROOT_CA_SERIAL_457200631_PEM).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(YUBICO_U2F_ROOT_CA_SERIAL_457200631_PEM).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -767,8 +775,8 @@ impl AttestationCa {
     /// strict category.
     pub fn microsoft_tpm_root_certificate_authority_2014() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(MICROSOFT_TPM_ROOT_CERTIFICATE_AUTHORITY_2014_PEM)
-                .expect("Invalid DER"),
+            // ca: x509::X509::from_pem(MICROSOFT_TPM_ROOT_CERTIFICATE_AUTHORITY_2014_PEM)
+                // .expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -779,7 +787,7 @@ impl AttestationCa {
     /// and easy to break or destroy.
     pub fn nitrokey_fido2_root_ca() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(NITROKEY_FIDO2_ROOT_CA_PEM).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(NITROKEY_FIDO2_ROOT_CA_PEM).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -790,7 +798,7 @@ impl AttestationCa {
     /// and easy to break or destroy.
     pub fn nitrokey_u2f_root_ca() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(NITROKEY_U2F_ROOT_CA_PEM).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(NITROKEY_U2F_ROOT_CA_PEM).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -798,7 +806,7 @@ impl AttestationCa {
     /// Android ROOT CA 1
     pub fn android_root_ca_1() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(ANDROID_ROOT_CA_1).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(ANDROID_ROOT_CA_1).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -806,7 +814,7 @@ impl AttestationCa {
     /// Android ROOT CA 2
     pub fn android_root_ca_2() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(ANDROID_ROOT_CA_2).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(ANDROID_ROOT_CA_2).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -814,7 +822,7 @@ impl AttestationCa {
     /// Android ROOT CA 3
     pub fn android_root_ca_3() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(ANDROID_ROOT_CA_3).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(ANDROID_ROOT_CA_3).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -822,7 +830,7 @@ impl AttestationCa {
     /// Android SOFTWARE ONLY root CA
     pub fn android_software_ca() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(ANDROID_SOFTWARE_ROOT_CA).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(ANDROID_SOFTWARE_ROOT_CA).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -830,7 +838,7 @@ impl AttestationCa {
     /// Google SafetyNet CA (for android)
     pub fn google_safetynet_ca() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(GOOGLE_SAFETYNET_CA).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(GOOGLE_SAFETYNET_CA).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -839,7 +847,7 @@ impl AttestationCa {
     #[allow(unused)]
     pub(crate) fn google_safetynet_ca_old() -> Self {
         AttestationCa {
-            ca: x509::X509::from_pem(GOOGLE_SAFETYNET_CA_OLD).expect("Invalid DER"),
+            // ca: x509::X509::from_pem(GOOGLE_SAFETYNET_CA_OLD).expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -871,11 +879,14 @@ impl AttestationCaList {
     /// Insert a new att_ca into this Attestation Ca List
     pub fn insert(
         &mut self,
-        att_ca: AttestationCa,
+        _att_ca: AttestationCa,
     ) -> Result<Option<AttestationCa>, WebauthnError> {
         // Get the key id (kid, digest).
-        let att_ca_dgst = att_ca.get_kid()?;
-        Ok(self.cas.insert(att_ca_dgst.into(), att_ca))
+        // let att_ca_dgst = att_ca.get_kid()?;
+        // Ok(self.cas.insert(
+        //     att_ca_dgst.into(),
+        //      att_ca))
+        return Err(WebauthnError::Configuration)
     }
 
     /// This is a list of CA's who's manufactured authenticators are of the highest

@@ -834,7 +834,7 @@ mod tests {
         let mut aaguids = BTreeSet::new();
         aaguids.insert(AAGUID);
         let att_ca_list: AttestationCaList = AttestationCa {
-            ca: ca_root,
+            // ca: ca_root,
             aaguids,
         }
         .try_into()

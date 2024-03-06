@@ -1,7 +1,7 @@
 //! Possible errors that may occur during Webauthn Operation processing
 
 use base64::DecodeError as b64DecodeError;
-use openssl::error::ErrorStack as OpenSSLErrorStack;
+// use openssl::error::ErrorStack as OpenSSLErrorStack;
 use serde_cbor::error::Error as CBORError;
 use serde_json::error::Error as JSONError;
 // use serde::{Deserialize, Serialize};
@@ -174,8 +174,12 @@ pub enum WebauthnError {
     #[error("In parsing the attestation object, there was insufficient data")]
     ParseInsufficientBytesAvailable,
 
-    #[error("An OpenSSL Error has occurred")]
-    OpenSSLError(#[from] OpenSSLErrorStack),
+    // #[error("An OpenSSL Error has occurred")]
+    // OpenSSLError(#[from] OpenSSLErrorStack),
+
+    #[error("The error happened in the prase of getting a P256 Key")]
+    GetP256Key,
+
 
     #[error("The requested OpenSSL curve is not supported by OpenSSL")]
     OpenSSLErrorNoCurveName,
