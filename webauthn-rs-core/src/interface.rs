@@ -2,7 +2,7 @@
 //! to allow persistance and should not change.
 
 // use crate::attestation::{verify_attestation_ca_chain, AttestationFormat};
-use crate::attestation::{AttestationFormat};
+use crate::attestation::AttestationFormat;
 
 // use crate::constants::*;
 use crate::error::*;
@@ -478,7 +478,11 @@ impl Into<SerialisableAttestationData> for ParsedAttestationData {
             ParsedAttestationData::Basic(chain) => SerialisableAttestationData::Basic(
                 chain
                     .into_iter()
-                    .map(|c| Base64UrlSafeData(p256::pkcs8::der::Encode::to_der(&c).expect("Invalid DER")))
+                    .map(|c| {
+                        Base64UrlSafeData(
+                            p256::pkcs8::der::Encode::to_der(&c).expect("Invalid DER"),
+                        )
+                    })
                     .collect(),
             ),
             ParsedAttestationData::Self_ => SerialisableAttestationData::Self_,
@@ -486,14 +490,22 @@ impl Into<SerialisableAttestationData> for ParsedAttestationData {
                 // Base64UrlSafeData(c.to_der().expect("Invalid DER")),
                 chain
                     .into_iter()
-                    .map(|c| Base64UrlSafeData(p256::pkcs8::der::Encode::to_der(&c).expect("Invalid DER")))
+                    .map(|c| {
+                        Base64UrlSafeData(
+                            p256::pkcs8::der::Encode::to_der(&c).expect("Invalid DER"),
+                        )
+                    })
                     .collect(),
             ),
             ParsedAttestationData::AnonCa(chain) => SerialisableAttestationData::AnonCa(
                 // Base64UrlSafeData(c.to_der().expect("Invalid DER")),
                 chain
                     .into_iter()
-                    .map(|c| Base64UrlSafeData(p256::pkcs8::der::Encode::to_der(&c).expect("Invalid DER")))
+                    .map(|c| {
+                        Base64UrlSafeData(
+                            p256::pkcs8::der::Encode::to_der(&c).expect("Invalid DER"),
+                        )
+                    })
                     .collect(),
             ),
             ParsedAttestationData::ECDAA => SerialisableAttestationData::ECDAA,
@@ -524,7 +536,9 @@ impl TryFrom<SerialisableAttestationData> for ParsedAttestationData {
             //         .map(|c| x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError))
             //         .collect::<WebauthnResult<_>>()?,
             // ),
-            SerialisableAttestationData::AnonCa(_chain) => return Err(WebauthnError::Configuration),
+            SerialisableAttestationData::AnonCa(_chain) => {
+                return Err(WebauthnError::Configuration)
+            }
             // ParsedAttestationData::AnonCa(
             //     // x509::X509::from_der(&c.0).map_err(WebauthnError::OpenSSLError)?,
             //     chain
@@ -776,7 +790,7 @@ impl AttestationCa {
     pub fn microsoft_tpm_root_certificate_authority_2014() -> Self {
         AttestationCa {
             // ca: x509::X509::from_pem(MICROSOFT_TPM_ROOT_CERTIFICATE_AUTHORITY_2014_PEM)
-                // .expect("Invalid DER"),
+            // .expect("Invalid DER"),
             aaguids: BTreeSet::default(),
         }
     }
@@ -886,7 +900,7 @@ impl AttestationCaList {
         // Ok(self.cas.insert(
         //     att_ca_dgst.into(),
         //      att_ca))
-        return Err(WebauthnError::Configuration)
+        return Err(WebauthnError::Configuration);
     }
 
     /// This is a list of CA's who's manufactured authenticators are of the highest

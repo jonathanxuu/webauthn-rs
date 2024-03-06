@@ -412,7 +412,7 @@ pub struct AttestationObject<T: Ceremony> {
     /// auth_data.
     pub(crate) auth_data: AuthenticatorData<T>,
     /// auth_data_bytes.
-    #[allow(unused)]   
+    #[allow(unused)]
     pub(crate) auth_data_bytes: Vec<u8>,
     /// ep_att
     pub(crate) _ep_att: Option<bool>,

@@ -21,8 +21,8 @@ use url::Url;
 
 use crate::attestation::{
     verify_android_key_attestation, verify_android_safetynet_attestation,
-    verify_apple_anonymous_attestation, verify_fidou2f_attestation,
-    verify_packed_attestation, verify_tpm_attestation, AttestationFormat,
+    verify_apple_anonymous_attestation, verify_fidou2f_attestation, verify_packed_attestation,
+    verify_tpm_attestation, AttestationFormat,
 };
 use crate::constants::{AUTHENTICATOR_TIMEOUT, CHALLENGE_SIZE_BYTES};
 use crate::crypto::compute_sha256;
@@ -3567,7 +3567,7 @@ mod tests {
     //             {
     //             "type": "public-key",
     //             "alg": -7
-    //             }              
+    //             }
     //         ],
     //         "authenticatorSelection": {
     //             "authenticatorAttachment": "platform",

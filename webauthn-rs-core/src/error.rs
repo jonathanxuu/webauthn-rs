@@ -176,10 +176,8 @@ pub enum WebauthnError {
 
     // #[error("An OpenSSL Error has occurred")]
     // OpenSSLError(#[from] OpenSSLErrorStack),
-
     #[error("The error happened in the prase of getting a P256 Key")]
     GetP256Key,
-
 
     #[error("The requested OpenSSL curve is not supported by OpenSSL")]
     OpenSSLErrorNoCurveName,

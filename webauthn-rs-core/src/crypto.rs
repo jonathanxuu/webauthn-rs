@@ -13,9 +13,8 @@ use core::convert::TryFrom;
 use super::error::*;
 // use crate::attestation::{AttestationX509Extension, FidoGenCeAaguid};
 use crate::proto::*;
-use sha2:: {Sha256, Digest};
+use sha2::{Digest, Sha256};
 // use crate::internals::{tpm_device_attribute_parser, TpmVendor};
-
 
 use p256::ecdsa::signature::Verifier;
 use p256::ecdsa::Signature as P256Signature;
@@ -726,7 +725,7 @@ impl COSEKey {
 
                 // println!("compute_sha256 {:?}", compute_sha256(verification_data));
 
-                return Ok(())
+                return Ok(());
             }
             _ => Err(WebauthnError::COSEKeyInvalidType),
         }
@@ -788,11 +787,14 @@ impl COSEKey {
                 println!("p256 pubkey bytes: {:?}\n", hex::encode(&pubkey_bytes));
 
                 // let point = EncodedPoint::from_bytes(&pubkey_bytes)?;
-                let point = EncodedPoint::from_bytes(&pubkey_bytes).map_err(|_err| WebauthnError::GetP256Key)?;
+                let point = EncodedPoint::from_bytes(&pubkey_bytes)
+                    .map_err(|_err| WebauthnError::GetP256Key)?;
 
-                let verifying_key = VerifyingKey::from_encoded_point(&point).map_err(|_err| WebauthnError::GetP256Key)?;
+                let verifying_key = VerifyingKey::from_encoded_point(&point)
+                    .map_err(|_err| WebauthnError::GetP256Key)?;
 
-                let _sig = P256Signature::from_der(signature).map_err(|_err| WebauthnError::GetP256Key)?;
+                let _sig =
+                    P256Signature::from_der(signature).map_err(|_err| WebauthnError::GetP256Key)?;
 
                 // let mut hasher = Sha256::new();
                 // hasher.update(verification_data);

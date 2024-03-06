@@ -306,7 +306,6 @@ impl AttestationX509Extension for AppleAnonymousNonce {
     const VALIDATION_ERROR: WebauthnError = WebauthnError::AttestationCertificateNonceMismatch;
 }
 
-
 // open x509
 // pub(crate) fn validate_extension<T>(
 //     x509: &x509::X509,
@@ -617,7 +616,6 @@ pub(crate) fn verify_fidou2f_attestation(
 
     // Ok(attestation)
     return Err(WebauthnError::Configuration);
-
 }
 
 // https://w3c.github.io/webauthn/#sctn-tpm-attestation
@@ -887,7 +885,6 @@ pub(crate) fn verify_tpm_attestation(
     //     },
     // ))
     return Err(WebauthnError::Configuration);
-
 }
 
 // open: x509
@@ -958,7 +955,6 @@ pub(crate) fn verify_apple_anonymous_attestation(
     //     AttestationMetadata::None,
     // ))
     return Err(WebauthnError::Configuration);
-
 }
 
 /// https://www.w3.org/TR/webauthn-3/#sctn-android-key-attestation
@@ -1066,7 +1062,6 @@ pub(crate) fn verify_android_key_attestation(
     // // 5. If successful, return implementation-specific values representing attestation type Anonymous CA and attestation trust path x5c.
     // Ok((ParsedAttestationData::Basic(arr_x509), meta))
     return Err(WebauthnError::Configuration);
-
 }
 
 /// https://www.w3.org/TR/webauthn/#sctn-android-safetynet-attestation
@@ -1240,7 +1235,6 @@ pub(crate) fn verify_android_safetynet_attestation(
     // // 5. If successful, return implementation-specific values representing attestation type Anonymous CA and attestation trust path x5c.
     // Ok((ParsedAttestationData::Basic(x5c), metadata))
     return Err(WebauthnError::Configuration);
-
 }
 
 // Verify the attestation chain
